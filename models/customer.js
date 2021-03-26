@@ -95,20 +95,26 @@ class Customer {
     return `${this.firstName} ${this.lastName}`
   }
 
-  async searchCustomer(str) {
+  static async search(str) {
     let nameArray = str.split(' ');
-    let firstName = nameArray[0];
-    let lastName = nameArray[0];
-
-    const results = await db.query(
+    let results;
+    let namePart1 = nameArray[0];
+    namePart1 = namePart1[0].toUpperCase() + namePart1.slice(1);
+    let namePart2 = nameArray[1];
+    if(namePart2){
+      namePart2 = namePart2[0].toUpperCase() + namePart2.slice(1);
+    } else {
+      namePart2 = namePart1;
+    }
+    results = await db.query(
       `SELECT id,
                   first_name AS "firstName",
                   last_name  AS "lastName",
                   phone,
                   notes
-           FROM customers
-           WHERE first_name = ${firstName}, last_name = ${lastName}
-           ORDER BY id`,
+          FROM customers
+          WHERE first_name LIKE '%${namePart1}%' or last_name LIKE '${namePart2}%'
+          ORDER BY id`,
     );
     return results.rows.map(c => new Customer(c));
   }
