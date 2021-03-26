@@ -1,8 +1,10 @@
 "use strict";
 
+const { response } = require("express");
 /** Routes for Lunchly */
 
 const express = require("express");
+const { NotFoundError } = require("./expressError");
 
 const Customer = require("./models/customer");
 const Reservation = require("./models/reservation");
@@ -37,6 +39,15 @@ router.post("/add/", async function (req, res, next) {
 
   return res.redirect(`/${customer.id}/`);
 });
+
+router.get("/valued-customers/", async function (req, res, next) {
+  const customers = await Customer.bestCustomers();
+  if(!customers){
+    throw new NotFoundError();
+  }
+  return res.render("best_customer_list.html", { customers } )
+});
+
 
 /** Show a customer, given their ID. */
 
@@ -87,5 +98,6 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
 
   return res.redirect(`/${customerId}/`);
 });
+
 
 module.exports = router;

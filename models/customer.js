@@ -113,9 +113,27 @@ class Customer {
                   phone,
                   notes
           FROM customers
-          WHERE first_name LIKE '%${namePart1}%' or last_name LIKE '${namePart2}%'
+          WHERE first_name LIKE $1 or last_name LIKE $2
           ORDER BY id`,
+      [`${namePart1}%`, `${namePart2}%`]
     );
+    return results.rows.map(c => new Customer(c));
+  }
+
+  static async bestCustomers(){
+    const results = await db.query(`SELECT customers.id,
+                                                first_name AS "firstName",
+                                                last_name  AS "lastName",
+                                                phone,
+                                                customers.notes,
+                                                count(*)
+                                            FROM customers
+                                            JOIN reservations
+                                            ON customers.id = reservations.customer_id
+                                            GROUP BY first_name, last_name, customers.id
+                                            ORDER BY count(*) DESC
+                                            LIMIT 10`);
+    console.log(results.rows);
     return results.rows.map(c => new Customer(c));
   }
 }

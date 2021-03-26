@@ -57,12 +57,12 @@ class Reservation {
                  start_at=$3,
                  notes=$4
              WHERE id = $5`, [
-      this.id,
-      this.customerId,
-      this.numGuests,
-      this.startAt,
-      this.notes
-      ],
+          this.customerId,
+          this.numGuests,
+          this.startAt,
+          this.notes,
+          this.id,
+        ],
       );
     }
   }
